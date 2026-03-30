@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>CGPA</title>
+
+    <style>
+        :root {
+            --bg: #0b0f14;
+            --surface: #121826;
+            --card: #151a24;
+            --field: #0b0f14;
+            --primary: #9bb1ff;
+            --border: #242a3a;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            background: #0b0f14;
+            color: white;
+            font-family: system-ui;
+            padding-bottom: 110px;
+        }
+
+        /* HERO */
+
+        .hero {
+            margin: 16px;
+            padding: 26px;
+            border-radius: 28px;
+            background:
+                linear-gradient(135deg, #9bb1ff55, #6f87ff20),
+                rgba(255, 255, 255, .04);
+            backdrop-filter: blur(14px);
+            border: 1px solid #ffffff18;
+            box-shadow: 0 18px 50px #00000090;
+            transition: .3s;
+        }
+
+        .glow {
+            box-shadow: 0 0 40px #4caf5060, 0 18px 50px #00000090;
+        }
+
+        .heroRow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .leftInfo {
+            display: flex;
+            flex-direction: column;
+            gap: 8px
+        }
+
+        .badge {
+            background: #00000060;
+            padding: 6px 14px;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            width: max-content;
+        }
+
+        .credits {
+            opacity: .8;
+            font-size: 13px;
+        }
+
+        .heroRow h1 {
+            margin: 0;
+            font-size: 52px;
+            font-weight: 800;
+            letter-spacing: .5px;
+        }
+
+        /* TOGGLE */
+
+        .toggle {
+            display: flex;
+            gap: 12px;
+            margin: 0 16px;
+        }
+
+        .toggle button {
+            flex: 1;
+            padding: 14px;
+            border-radius: 22px;
+            border: 1px solid #444;
+            background: #0b0f14;
+            color: #aaa;
+            font-weight: 600;
+        }
+
+        .toggle .active {
+            background: linear-gradient(135deg, #9bb1ff, #6f87ff);
+            color: black;
+            border: none;
+        }
+
+        /* MAIN CARD */
+
+        .card {
+            background: var(--surface);
+            margin: 16px;
+            padding: 18px;
+            border-radius: 26px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px #00000060;
+        }
+
+        /* ITEM CARD */
+
+        .item {
+            background: #0f1420;
+            border-radius: 24px;
+            padding: 16px;
+            margin-top: 14px;
+            position: relative;
+            box-shadow: 0 6px 18px #00000070;
+        }
+
+        .tag {
+            font-size: 12px;
+            opacity: .6;
+            margin-bottom: 8px;
+        }
+
+        .del {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #ff5252;
+            border: none;
+            color: white;
+            box-shadow: 0 6px 16px #ff525260;
+        }
+
+        /* INPUTS */
+
+        input,
+        select {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 16px;
+            background: #0b0f14;
+            color: white;
+            font-size: 14px;
+        }
+
+        .title {
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .row {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .row select {
+            flex: 1.5
+        }
+
+        .row input[type=number] {
+            flex: .7
+        }
+
+        /* ADD BUTTON */
+
+        .small {
+            width: 100%;
+            margin-top: 16px;
+            background: none;
+            border: 1px dashed #444;
+            color: #aaa;
+            padding: 14px;
+            border-radius: 22px;
+        }
+
+        /* BOTTOM BAR */
+
+        .bottom {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 16px;
+            background: #0b0f14ee;
+            display: flex;
+            gap: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .calc,
+        .clear {
+            flex: 1;
+            padding: 18px;
+            border: none;
+            border-radius: 26px;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .calc {
+            background: linear-gradient(135deg, #9bb1ff, #6f87ff);
+            color: black;
+        }
+
+        .clear {
+            background: #1b1f2a;
+            color: #bbb;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="hero" id="hero">
+        <div class="heroRow">
+            <div class="leftInfo">
+                <div class="badge" id="grade">–</div>
+                <div class="credits" id="credits">0 Credits</div>
+            </div>
+            <h1 id="result">0.00</h1>
+        </div>
+    </div>
+
+    <div class="toggle">
+        <button id="scBtn" class="active" onclick="activateAndCalculate('sc')">SCGPA</button>
+        <button id="cgBtn" onclick="activateAndCalculate('cg')">CGPA</button>
+    </div>
+
+    <div class="card">
+
+        <div id="scgpa"></div>
+        <button class="small" id="courseBtn" onclick="addCourse()">Add Course</button>
+
+        <div id="cgpa" style="display:none"></div>
+        <button class="small" id="semBtn" onclick="addSemester()" style="display:none">Add Semester</button>
+
+    </div>
+
+    <div class="bottom">
+        <button class="calc" onclick="calculate()">Calculate</button>
+        <button class="clear" onclick="clearAll()">Clear All</button>
+    </div>
+
+    <script>
+        // detect clicks on empty card area (not inputs)
+        scgpa.addEventListener("click", (e) => {
+            if (e.target.closest(".item")) return; // ignore item clicks
+            activateAndCalculate("sc");
+        });
+
+        cgpa.addEventListener("click", (e) => {
+            if (e.target.closest(".item")) return;
+            activateAndCalculate("cg");
+        });
+        let current = "sc";
+
+        let lastSC = { value: 0, credit: 0 };
+        let lastCG = { value: 0, credit: 0 };
+
+        function mode(m) {
+            current = m;
+
+            scBtn.classList.toggle("active", m === "sc");
+            cgBtn.classList.toggle("active", m === "cg");
+
+            scgpa.style.display = m === "sc" ? "block" : "none";
+            cgpa.style.display = m === "cg" ? "block" : "none";
+
+            courseBtn.style.display = m === "sc" ? "block" : "none";
+            semBtn.style.display = m === "cg" ? "block" : "none";
+        }
+
+        function activateAndCalculate(m) {
+
+            if (current === m) {
+                calculate();
+                return;
+            }
+
+            mode(m);
+            calculate();
+
+        }
+
+        function addCourse(v = {}) {
+            scgpa.insertAdjacentHTML("beforeend", `
+<div class="item" onclick="event.stopPropagation()">
+<button class="del" onclick="this.parentNode.remove();save()">✕</button>
+<div class="tag">Course</div>
+<input class="title" placeholder="Course name" value="${v.n || ""}">
+<div class="row">
+<select>
+<option>A+ (4.00) [80–100]</option>
+<option>A (3.75) [75–79]</option>
+<option>A− (3.50) [70–74]</option>
+<option>B+ (3.25) [65–69]</option>
+<option>B (3.00) [60–64]</option>
+<option>B− (2.75) [55–59]</option>
+<option>C+ (2.50) [50–54]</option>
+<option>C (2.25) [45–49]</option>
+<option>D (2.00) [40–44]</option>
+<option>F (0.00) [00–39]</option>
+</select>
+<input type="number" placeholder="Credit" min="0" oninput="if(this.value<0)this.value=0" value="${v.c || ""}">
+</div>
+</div>
+`);
+            if (v.g) scgpa.lastElementChild.querySelector("select").value = v.g;
+            save();
+        }
+
+        function addSemester(v = {}) {
+            let num = cgpa.children.length + 1;
+            cgpa.insertAdjacentHTML("beforeend", `
+<div class="item" onclick="event.stopPropagation()">
+<button class="del" onclick="this.parentNode.remove();save()">✕</button>
+<div class="tag">Semester</div>
+<input class="title" value="${v.n || ("Semester " + num)}">
+<div class="row">
+<input type="number" step="0.01" placeholder="GPA" min="0" max="4.00" oninput="if(this.value>4)this.value=4; if(this.value<0)this.value=0;" value="${v.g || ""}">
+<input type="number" placeholder="Credit" min="0" oninput="if(this.value<0)this.value=0" value="${v.c || ""}">
+</div>
+</div>
+`);
+            save();
+        }
+
+        function colorResult(v) {
+            result.style.color = v >= 3.5 ? "#4caf50" : v >= 2.5 ? "#ffc107" : "#ff5252";
+            hero.classList.toggle("glow", v >= 3.5);
+        }
+
+        function gradeBadge(v) {
+            grade.innerText =
+                v >= 3.75 ? "A+" :
+                    v >= 3.5 ? "A" :
+                        v >= 3.25 ? "B+" :
+                            v >= 3 ? "B" :
+                                v >= 2.75 ? "B-" :
+                                    v >= 2.5 ? "C+" :
+                                        v >= 2.25 ? "C" :
+                                            v >= 2 ? "D" : "F";
+        }
+
+        function animate(v, cr) {
+            let s = parseFloat(result.innerText) || 0, d = v - s, t = 0;
+            let i = setInterval(() => {
+                t += .05; if (t >= 1) { t = 1; clearInterval(i); }
+                let val = (s + d * t).toFixed(2);
+                result.innerText = val;
+                colorResult(parseFloat(val));
+                gradeBadge(parseFloat(val));
+                credits.innerText = cr + " Credits";
+            }, 16);
+        }
+
+        function calculate() {
+            navigator.vibrate?.(30);
+            let t = 0, c = 0;
+
+            if (current === "sc") {
+                document.querySelectorAll("#scgpa .item").forEach(i => {
+                    let g = parseFloat(i.querySelector("select").value.match(/\((.*?)\)/)[1]);
+                    let cr = parseFloat(i.querySelectorAll("input")[1].value) || 0;
+                    t += g * cr; c += cr;
+                });
+            } else {
+                document.querySelectorAll("#cgpa .item").forEach(i => {
+                    let ins = i.querySelectorAll("input");
+                    t += (parseFloat(ins[1].value) || 0) * (parseFloat(ins[2].value) || 0);
+                    c += parseFloat(ins[2].value) || 0;
+                });
+            }
+
+            let val = c ? t / c : 0;
+
+            animate(val, c);
+
+            // SAVE PER MODE
+            if (current === "sc") {
+                lastSC = { value: val, credit: c };
+            } else {
+                lastCG = { value: val, credit: c };
+            }
+
+            // scroll to top smoothly
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            save();
+        }
+
+        function clearAll() {
+            navigator.vibrate?.(30);
+
+            if (current === "sc") {
+                scgpa.innerHTML = "";
+                addCourse();
+                lastSC = { value: 0, credit: 0 }; // 🔥 clear cache
+            }
+            else {
+                cgpa.innerHTML = "";
+                lastCG = { value: 0, credit: 0 }; // 🔥 clear cache
+            }
+
+            result.innerText = "0.00";
+            grade.innerText = "–";
+            credits.innerText = "0 Credits";
+            hero.classList.remove("glow");
+
+            save();
+        }
+
+        function save() {
+            let d = { mode: current, result: result.innerText, courses: [], semesters: [] };
+            document.querySelectorAll("#scgpa .item").forEach(i => {
+                d.courses.push({
+                    n: i.querySelector(".title").value,
+                    g: i.querySelector("select").value,
+                    c: i.querySelectorAll("input")[1].value
+                });
+            });
+            document.querySelectorAll("#cgpa .item").forEach(i => {
+                let ins = i.querySelectorAll("input");
+                d.semesters.push({ n: ins[0].value, g: ins[1].value, c: ins[2].value });
+            });
+            localStorage.cgpa = JSON.stringify(d);
+        }
+
+        function restore() {
+            if (!localStorage.cgpa) return;
+            let d = JSON.parse(localStorage.cgpa);
+            mode(d.mode || "sc");
+            scgpa.innerHTML = "";
+            cgpa.innerHTML = "";
+            d.courses.forEach(addCourse);
+            d.semesters.forEach(addSemester);
+            calculate();
+        }
+
+        restore();
+        if (!scgpa.children.length) addCourse();
+
+    </script>
+
+</body>
+
+</html>
