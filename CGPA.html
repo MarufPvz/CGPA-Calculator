@@ -17,7 +17,16 @@
         }
 
         * {
-            box-sizing: border-box
+            box-sizing: border-box;
+        }
+
+        button {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        button:active {
+            transform: scale(0.96);
         }
 
         body {
@@ -124,12 +133,78 @@
             margin-top: 14px;
             position: relative;
             box-shadow: 0 6px 18px #00000070;
+            animation: slideIn 0.3s ease forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .item.removing {
+            transform: scale(0.9);
+            opacity: 0;
+            transition: 0.2s;
         }
 
         .tag {
             font-size: 12px;
             opacity: .6;
             margin-bottom: 8px;
+        }
+
+        .title-wrap {
+            margin-bottom: 8px;
+        }
+
+        .responsive-row {
+            flex-wrap: wrap;
+        }
+
+        .item .dc-title-wrap {
+            flex: 2;
+        }
+
+        .item.minimized .dc-title-wrap {
+            flex: 0 0 100%;
+        }
+
+        .item .dc-cr-wrap {
+            flex: 1;
+        }
+
+        .item .dc-grade-wrap {
+            display: none;
+            flex: 1.5;
+        }
+
+        .item.minimized .dc-grade-wrap {
+            display: flex;
+        }
+
+        .item.minimized .details-section {
+            display: none;
+        }
+
+        .min-btn {
+            position: absolute;
+            top: -10px;
+            right: 32px;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #2a3441;
+            border: none;
+            color: white;
+            box-shadow: 0 6px 16px #00000040;
+            font-size: 14px;
         }
 
         .del {
@@ -150,17 +225,57 @@
         input,
         select {
             width: 100%;
-            padding: 14px;
-            border: none;
+            padding: 20px 14px 8px 14px;
+            border: 1px solid transparent;
             border-radius: 16px;
             background: #0b0f14;
             color: white;
             font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        select {
+            padding-top: 20px;
+            padding-bottom: 8px;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #4c6ef5;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(76, 110, 245, 0.2);
+        }
+
+        .float-label {
+            position: relative;
+            flex: 1;
+            display: flex;
+        }
+
+        .float-label label {
+            position: absolute;
+            top: 15px;
+            left: 14px;
+            color: #888;
+            pointer-events: none;
+            transition: 0.2s ease all;
+            font-size: 14px;
+        }
+
+        .float-label input:focus~label,
+        .float-label input:not(:placeholder-shown)~label,
+        .float-label select~label {
+            top: 5px;
+            font-size: 11px;
+            color: var(--primary);
         }
 
         .title {
             font-size: 15px;
             font-weight: 500;
+        }
+
+        .title-wrap {
             margin-bottom: 8px;
         }
 
@@ -168,6 +283,46 @@
             display: flex;
             gap: 12px;
             margin-top: 10px;
+        }
+
+        .row-3 {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .input-wrap {
+            flex: 1;
+            position: relative;
+        }
+
+        .input-wrap span {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+            font-size: 14px;
+            pointer-events: none;
+        }
+
+        .input-wrap input {
+            padding-right: 30px;
+        }
+
+        .local-result {
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px dashed #333;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            color: #aaa;
+        }
+
+        .local-result span {
+            color: white;
+            font-weight: 600;
         }
 
         .row select {
@@ -188,6 +343,12 @@
             color: #aaa;
             padding: 14px;
             border-radius: 22px;
+        }
+
+        .small:hover {
+            border-color: #777;
+            color: #fff;
+            background: #ffffff05;
         }
 
         /* BOTTOM BAR */
@@ -216,12 +377,21 @@
 
         .calc {
             background: linear-gradient(135deg, #9bb1ff, #6f87ff);
-            color: black;
+            color: #0b0f14;
+        }
+
+        .calc:hover {
+            box-shadow: 0 0 20px #6f87ff40;
         }
 
         .clear {
             background: #1b1f2a;
             color: #bbb;
+        }
+
+        .clear:hover {
+            background: #242a3a;
+            color: #fff;
         }
     </style>
 </head>
@@ -239,27 +409,37 @@
     </div>
 
     <div class="toggle">
+        <button id="dcBtn" onclick="activateAndCalculate('dc')">Course</button>
         <button id="scBtn" class="active" onclick="activateAndCalculate('sc')">SCGPA</button>
         <button id="cgBtn" onclick="activateAndCalculate('cg')">CGPA</button>
     </div>
 
     <div class="card">
 
+        <div id="dcgpa" style="display:none"></div>
+        <button class="small" id="detailBtn" onclick="addDetail({}, true)" style="display:none">Add Course
+            Detail</button>
+
         <div id="scgpa"></div>
-        <button class="small" id="courseBtn" onclick="addCourse()">Add Course</button>
+        <button class="small" id="courseBtn" onclick="addCourse({}, true)">Add Course</button>
 
         <div id="cgpa" style="display:none"></div>
-        <button class="small" id="semBtn" onclick="addSemester()" style="display:none">Add Semester</button>
+        <button class="small" id="semBtn" onclick="addSemester({}, true)" style="display:none">Add Semester</button>
 
     </div>
 
     <div class="bottom">
-        <button class="calc" onclick="calculate()">Calculate</button>
+        <button class="calc" onclick="calculate(true)">Calculate</button>
         <button class="clear" onclick="clearAll()">Clear All</button>
     </div>
 
     <script>
         // detect clicks on empty card area (not inputs)
+        dcgpa.addEventListener("click", (e) => {
+            if (e.target.closest(".item")) return;
+            activateAndCalculate("dc");
+        });
+
         scgpa.addEventListener("click", (e) => {
             if (e.target.closest(".item")) return; // ignore item clicks
             activateAndCalculate("sc");
@@ -269,77 +449,209 @@
             if (e.target.closest(".item")) return;
             activateAndCalculate("cg");
         });
-        let current = "sc";
 
-        let lastSC = { value: 0, credit: 0 };
-        let lastCG = { value: 0, credit: 0 };
+        let current = "sc";
+        let animationInterval; // Fix for animation glitch
+
+        // Event delegation for items
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('del')) {
+                let item = e.target.closest('.item');
+                item.classList.add('removing');
+                setTimeout(() => {
+                    item.remove();
+                    save();
+                    calculate(false);
+                }, 200); // Wait for CSS animation
+            }
+            if (e.target.classList.contains('min-btn')) {
+                let item = e.target.closest('.item');
+                item.classList.toggle('minimized');
+                let isMin = item.classList.contains('minimized');
+                e.target.innerText = isMin ? '▼' : '▲';
+                save();
+                calculate(false);
+            }
+        });
+
+        document.addEventListener('input', (e) => {
+            // Validate inputs
+            if (e.target.type === 'number') {
+                if (parseFloat(e.target.value) < 0) e.target.value = 0;
+                if (e.target.step === '0.01' && parseFloat(e.target.value) > 4.00) e.target.value = 4.00;
+                if (e.target.hasAttribute('max') && parseFloat(e.target.value) > parseFloat(e.target.max)) {
+                    e.target.value = e.target.max;
+                }
+            }
+
+            // Auto calculate on any input change within items
+            if (e.target.closest('.item')) {
+                save();
+                calculate(false);
+            }
+        });
 
         function mode(m) {
             current = m;
-
+            dcBtn.classList.toggle("active", m === "dc");
             scBtn.classList.toggle("active", m === "sc");
             cgBtn.classList.toggle("active", m === "cg");
 
+            dcgpa.style.display = m === "dc" ? "block" : "none";
             scgpa.style.display = m === "sc" ? "block" : "none";
             cgpa.style.display = m === "cg" ? "block" : "none";
 
+            detailBtn.style.display = m === "dc" ? "block" : "none";
             courseBtn.style.display = m === "sc" ? "block" : "none";
             semBtn.style.display = m === "cg" ? "block" : "none";
         }
 
         function activateAndCalculate(m) {
-
             if (current === m) {
-                calculate();
+                calculate(true);
                 return;
             }
-
             mode(m);
-            calculate();
-
+            calculate(true);
         }
 
-        function addCourse(v = {}) {
-            scgpa.insertAdjacentHTML("beforeend", `
-<div class="item" onclick="event.stopPropagation()">
-<button class="del" onclick="this.parentNode.remove();save()">✕</button>
+        function addDetail(v = {}, focus = false) {
+            let div = document.createElement("div");
+            div.className = "item" + (v.min ? " minimized" : "");
+            div.innerHTML = `
+<button class="min-btn">${v.min ? '▼' : '▲'}</button>
+<button class="del">✕</button>
+<div class="tag">Detailed Course</div>
+<div class="row responsive-row">
+    <div class="float-label dc-title-wrap">
+        <input class="title" placeholder=" " value="${v.n || ""}">
+        <label>Course Name</label>
+    </div>
+    <div class="float-label dc-grade-wrap">
+        <select class="dc-grade">
+            <option>A+ (4.00) [80–100]</option>
+            <option>A (3.75) [75–79]</option>
+            <option>A− (3.50) [70–74]</option>
+            <option>B+ (3.25) [65–69]</option>
+            <option>B (3.00) [60–64]</option>
+            <option>B− (2.75) [55–59]</option>
+            <option>C+ (2.50) [50–54]</option>
+            <option>C (2.25) [45–49]</option>
+            <option>D (2.00) [40–44]</option>
+            <option>F (0.00) [00–39]</option>
+        </select>
+        <label>Grade</label>
+    </div>
+    <div class="float-label dc-cr-wrap">
+        <input type="number" placeholder=" " min="0" value="${v.c || ""}" class="dc-cr">
+        <label>Credit</label>
+    </div>
+</div>
+<div class="details-section">
+    <div class="row-3">
+        <div class="float-label"><input type="number" placeholder=" " max="15" value="${v.q1 || ""}" class="dc-q"><label>Quiz 1</label></div>
+        <div class="float-label"><input type="number" placeholder=" " max="15" value="${v.q2 || ""}" class="dc-q"><label>Quiz 2</label></div>
+        <div class="float-label"><input type="number" placeholder=" " max="15" value="${v.q3 || ""}" class="dc-q"><label>Quiz 3</label></div>
+    </div>
+    <div class="row-3">
+        <div class="input-wrap float-label">
+            <input type="number" placeholder=" " max="100" value="${v.att || ""}" class="dc-att">
+            <label>Attendance</label>
+            <span>%</span>
+        </div>
+        <div class="float-label"><input type="number" placeholder=" " max="5" value="${v.ass || ""}" class="dc-ass"><label>Assignment</label></div>
+        <div class="float-label"><input type="number" placeholder=" " max="7" value="${v.pres || ""}" class="dc-pres"><label>Presentation</label></div>
+    </div>
+    <div class="row-3">
+        <div class="float-label"><input type="number" placeholder=" " max="25" value="${v.mid || ""}" class="dc-mid"><label>Midterm</label></div>
+        <div class="float-label"><input type="number" placeholder=" " max="40" value="${v.fin || ""}" class="dc-fin"><label>Final</label></div>
+    </div>
+    <div class="local-result">
+        <div>Total: <span class="loc-mark">0</span>/100</div>
+        <div>Grade: <span class="loc-grade">F (0.00)</span></div>
+    </div>
+</div>`;
+            if (v.g) div.querySelector(".dc-grade").value = v.g;
+            dcgpa.appendChild(div);
+            // Save state but calculate is called separately if this was user initiated
+            save();
+            if (focus) {
+                div.querySelector(".title").focus();
+            } else {
+                calculate(false);
+            }
+        }
+
+        function addCourse(v = {}, focus = false) {
+            let div = document.createElement("div");
+            div.className = "item";
+            div.innerHTML = `
+<button class="del">✕</button>
 <div class="tag">Course</div>
-<input class="title" placeholder="Course name" value="${v.n || ""}">
+<div class="float-label title-wrap">
+    <input class="title" placeholder=" " value="${v.n || ""}">
+    <label>Course Name</label>
+</div>
 <div class="row">
-<select>
-<option>A+ (4.00) [80–100]</option>
-<option>A (3.75) [75–79]</option>
-<option>A− (3.50) [70–74]</option>
-<option>B+ (3.25) [65–69]</option>
-<option>B (3.00) [60–64]</option>
-<option>B− (2.75) [55–59]</option>
-<option>C+ (2.50) [50–54]</option>
-<option>C (2.25) [45–49]</option>
-<option>D (2.00) [40–44]</option>
-<option>F (0.00) [00–39]</option>
-</select>
-<input type="number" placeholder="Credit" min="0" oninput="if(this.value<0)this.value=0" value="${v.c || ""}">
-</div>
-</div>
-`);
-            if (v.g) scgpa.lastElementChild.querySelector("select").value = v.g;
+    <div class="float-label" style="flex: 1.5;">
+        <select>
+            <option>A+ (4.00) [80–100]</option>
+            <option>A (3.75) [75–79]</option>
+            <option>A− (3.50) [70–74]</option>
+            <option>B+ (3.25) [65–69]</option>
+            <option>B (3.00) [60–64]</option>
+            <option>B− (2.75) [55–59]</option>
+            <option>C+ (2.50) [50–54]</option>
+            <option>C (2.25) [45–49]</option>
+            <option>D (2.00) [40–44]</option>
+            <option>F (0.00) [00–39]</option>
+        </select>
+        <label>Grade</label>
+    </div>
+    <div class="float-label">
+        <input type="number" placeholder=" " min="0" value="${v.c || ""}">
+        <label>Credit</label>
+    </div>
+</div>`;
+            if (v.g) div.querySelector("select").value = v.g;
+            scgpa.appendChild(div);
+            // Save state but calculate is called separately if this was user initiated
             save();
+            if (focus) {
+                div.querySelector(".title").focus();
+            } else {
+                calculate(false);
+            }
         }
 
-        function addSemester(v = {}) {
+        function addSemester(v = {}, focus = false) {
             let num = cgpa.children.length + 1;
-            cgpa.insertAdjacentHTML("beforeend", `
-<div class="item" onclick="event.stopPropagation()">
-<button class="del" onclick="this.parentNode.remove();save()">✕</button>
+            let div = document.createElement("div");
+            div.className = "item";
+            div.innerHTML = `
+<button class="del">✕</button>
 <div class="tag">Semester</div>
-<input class="title" value="${v.n || ("Semester " + num)}">
+<div class="float-label title-wrap">
+    <input class="title" placeholder=" " value="${v.n || ("Semester " + num)}">
+    <label>Semester</label>
+</div>
 <div class="row">
-<input type="number" step="0.01" placeholder="GPA" min="0" max="4.00" oninput="if(this.value>4)this.value=4; if(this.value<0)this.value=0;" value="${v.g || ""}">
-<input type="number" placeholder="Credit" min="0" oninput="if(this.value<0)this.value=0" value="${v.c || ""}">
-</div>
-</div>
-`);
+    <div class="float-label" style="flex: 1.5;">
+        <input type="number" step="0.01" placeholder=" " min="0" max="4.00" value="${v.g || ""}">
+        <label>GPA</label>
+    </div>
+    <div class="float-label">
+        <input type="number" placeholder=" " min="0" value="${v.c || ""}">
+        <label>Credit</label>
+    </div>
+</div>`;
+            cgpa.appendChild(div);
             save();
+            if (focus) {
+                div.querySelector(".title").focus();
+            } else {
+                calculate(false);
+            }
         }
 
         function colorResult(v) {
@@ -359,10 +671,25 @@
                                             v >= 2 ? "D" : "F";
         }
 
+        function getGradeFromMark(mark) {
+            if (mark >= 80) return { l: "A+", p: 4.00, c: "#4caf50" };
+            if (mark >= 75) return { l: "A", p: 3.75, c: "#4caf50" };
+            if (mark >= 70) return { l: "A−", p: 3.50, c: "#4caf50" };
+            if (mark >= 65) return { l: "B+", p: 3.25, c: "#ffc107" };
+            if (mark >= 60) return { l: "B", p: 3.00, c: "#ffc107" };
+            if (mark >= 55) return { l: "B−", p: 2.75, c: "#ffc107" };
+            if (mark >= 50) return { l: "C+", p: 2.50, c: "#ffc107" };
+            if (mark >= 45) return { l: "C", p: 2.25, c: "#ff5252" };
+            if (mark >= 40) return { l: "D", p: 2.00, c: "#ff5252" };
+            return { l: "F", p: 0.00, c: "#ff5252" };
+        }
+
         function animate(v, cr) {
             let s = parseFloat(result.innerText) || 0, d = v - s, t = 0;
-            let i = setInterval(() => {
-                t += .05; if (t >= 1) { t = 1; clearInterval(i); }
+            if (animationInterval) clearInterval(animationInterval);
+
+            animationInterval = setInterval(() => {
+                t += .05; if (t >= 1) { t = 1; clearInterval(animationInterval); }
                 let val = (s + d * t).toFixed(2);
                 result.innerText = val;
                 colorResult(parseFloat(val));
@@ -371,13 +698,48 @@
             }, 16);
         }
 
-        function calculate() {
-            navigator.vibrate?.(30);
+        function calculate(scroll = false) {
+            if (scroll) navigator.vibrate?.(30);
             let t = 0, c = 0;
 
-            if (current === "sc") {
+            if (current === "dc") {
+                document.querySelectorAll("#dcgpa .item").forEach(i => {
+                    let cr = parseFloat(i.querySelector(".dc-cr").value) || 0;
+
+                    if (i.classList.contains("minimized")) {
+                        let gMatch = i.querySelector(".dc-grade").value.match(/\((.*?)\)/);
+                        let g = gMatch ? parseFloat(gMatch[1]) : 0;
+                        t += g * cr;
+                        c += cr;
+                    } else {
+                        let q1 = parseFloat(i.querySelectorAll(".dc-q")[0].value) || 0;
+                        let q2 = parseFloat(i.querySelectorAll(".dc-q")[1].value) || 0;
+                        let q3 = parseFloat(i.querySelectorAll(".dc-q")[2].value) || 0;
+                        let qAvg = (q1 + q2 + q3) / 3;
+
+                        let attP = parseFloat(i.querySelector(".dc-att").value) || 0;
+                        let attM = (attP / 100) * 8;
+
+                        let ass = parseFloat(i.querySelector(".dc-ass").value) || 0;
+                        let pres = parseFloat(i.querySelector(".dc-pres").value) || 0;
+                        let mid = parseFloat(i.querySelector(".dc-mid").value) || 0;
+                        let fin = parseFloat(i.querySelector(".dc-fin").value) || 0;
+
+                        let localTotal = Math.min(100, qAvg + attM + ass + pres + mid + fin);
+                        let gradeObj = getGradeFromMark(localTotal);
+
+                        i.querySelector(".loc-mark").innerText = localTotal.toFixed(1);
+                        i.querySelector(".loc-grade").innerText = `${gradeObj.l} (${gradeObj.p.toFixed(2)})`;
+                        i.querySelector(".loc-grade").style.color = gradeObj.c;
+
+                        t += gradeObj.p * cr;
+                        c += cr;
+                    }
+                });
+            } else if (current === "sc") {
                 document.querySelectorAll("#scgpa .item").forEach(i => {
-                    let g = parseFloat(i.querySelector("select").value.match(/\((.*?)\)/)[1]);
+                    let gMatch = i.querySelector("select").value.match(/\((.*?)\)/);
+                    let g = gMatch ? parseFloat(gMatch[1]) : 0;
                     let cr = parseFloat(i.querySelectorAll("input")[1].value) || 0;
                     t += g * cr; c += cr;
                 });
@@ -393,41 +755,53 @@
 
             animate(val, c);
 
-            // SAVE PER MODE
-            if (current === "sc") {
-                lastSC = { value: val, credit: c };
-            } else {
-                lastCG = { value: val, credit: c };
+            // scroll to top smoothly only if requested
+            if (scroll) {
+                window.scrollTo({ top: 0, behavior: "smooth" });
             }
-
-            // scroll to top smoothly
-            window.scrollTo({ top: 0, behavior: "smooth" });
             save();
         }
 
         function clearAll() {
             navigator.vibrate?.(30);
-
-            if (current === "sc") {
+            if (current === "dc") {
+                dcgpa.innerHTML = "";
+                addDetail();
+            }
+            else if (current === "sc") {
                 scgpa.innerHTML = "";
                 addCourse();
-                lastSC = { value: 0, credit: 0 }; // 🔥 clear cache
             }
             else {
                 cgpa.innerHTML = "";
-                lastCG = { value: 0, credit: 0 }; // 🔥 clear cache
             }
-
             result.innerText = "0.00";
             grade.innerText = "–";
             credits.innerText = "0 Credits";
             hero.classList.remove("glow");
-
             save();
+            calculate(false);
         }
 
         function save() {
-            let d = { mode: current, result: result.innerText, courses: [], semesters: [] };
+            let d = { mode: current, result: result.innerText, courses: [], semesters: [], details: [] };
+            document.querySelectorAll("#dcgpa .item").forEach(i => {
+                let isMin = i.classList.contains("minimized");
+                d.details.push({
+                    min: isMin,
+                    g: i.querySelector(".dc-grade").value,
+                    n: i.querySelector(".title").value,
+                    c: i.querySelector(".dc-cr").value,
+                    q1: i.querySelectorAll(".dc-q")[0].value,
+                    q2: i.querySelectorAll(".dc-q")[1].value,
+                    q3: i.querySelectorAll(".dc-q")[2].value,
+                    att: i.querySelector(".dc-att").value,
+                    ass: i.querySelector(".dc-ass").value,
+                    pres: i.querySelector(".dc-pres").value,
+                    mid: i.querySelector(".dc-mid").value,
+                    fin: i.querySelector(".dc-fin").value
+                });
+            });
             document.querySelectorAll("#scgpa .item").forEach(i => {
                 d.courses.push({
                     n: i.querySelector(".title").value,
@@ -446,15 +820,18 @@
             if (!localStorage.cgpa) return;
             let d = JSON.parse(localStorage.cgpa);
             mode(d.mode || "sc");
+            dcgpa.innerHTML = "";
             scgpa.innerHTML = "";
             cgpa.innerHTML = "";
-            d.courses.forEach(addCourse);
-            d.semesters.forEach(addSemester);
-            calculate();
+            (d.details || []).forEach(x => addDetail(x, false));
+            (d.courses || []).forEach(c => addCourse(c, false));
+            (d.semesters || []).forEach(s => addSemester(s, false));
+            calculate(false);
         }
 
         restore();
-        if (!scgpa.children.length) addCourse();
+        if (!dcgpa.children.length && current === "dc") addDetail();
+        if (!scgpa.children.length && current === "sc") addCourse();
 
     </script>
 
