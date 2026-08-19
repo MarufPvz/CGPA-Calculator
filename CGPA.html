@@ -275,10 +275,6 @@
             font-weight: 500;
         }
 
-        .title-wrap {
-            margin-bottom: 8px;
-        }
-
         .row {
             display: flex;
             gap: 12px;
@@ -560,7 +556,7 @@
             <span>%</span>
         </div>
         <div class="float-label"><input type="number" placeholder=" " max="5" value="${v.ass || ""}" class="dc-ass"><label>Assignment</label></div>
-        <div class="float-label"><input type="number" placeholder=" " max="7" value="${v.pres || ""}" class="dc-pres"><label>Presentation</label></div>
+        <div class="float-label"><input type="number" placeholder=" " max="8" value="${v.pres || ""}" class="dc-pres"><label>Presentation</label></div>
     </div>
     <div class="row-3">
         <div class="float-label"><input type="number" placeholder=" " max="25" value="${v.mid || ""}" class="dc-mid"><label>Midterm</label></div>
@@ -718,7 +714,7 @@
                         let qAvg = (q1 + q2 + q3) / 3;
 
                         let attP = parseFloat(i.querySelector(".dc-att").value) || 0;
-                        let attM = (attP / 100) * 8;
+                        let attM = (attP / 100) * 7;
 
                         let ass = parseFloat(i.querySelector(".dc-ass").value) || 0;
                         let pres = parseFloat(i.querySelector(".dc-pres").value) || 0;
